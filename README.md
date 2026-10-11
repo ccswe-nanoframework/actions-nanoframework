@@ -1,108 +1,20 @@
-# actions-nanoframework
+# actions-nanoframework (archived)
 
-Reusable GitHub Actions workflows and composite actions for building, testing, and publishing .NET nanoFramework repos.
+**Moved to [ccswe-apps/actions](https://github.com/ccswe-apps/actions).** This repo is archived and gets no fixes. Existing `@master` references keep working as frozen code because archived repos stay readable.
 
-## Workflows
+| Old | New |
+|---|---|
+| `.github/workflows/nanoframework-build-publish.yml` with `publish-nuget: true` | `ccswe-apps/actions/.github/workflows/nanoframework-build-library.yml` |
+| `.github/workflows/nanoframework-build-publish.yml` without `publish-nuget` | `ccswe-apps/actions/.github/workflows/nanoframework-build-app.yml` |
+| `.github/workflows/nanoframework-update-dependencies.yml` | `ccswe-apps/actions/.github/workflows/nanoframework-update-dependencies.yml` (same inputs) |
+| `.github/actions/setup-nanoframework`, `build-nanoframework` | `ccswe-apps/actions/.github/actions/setup-nanoframework`, `build-nanoframework` |
 
-### `nanoframework-build-publish.yml`
+Changes when switching:
 
-```yaml
-name: Build, test, and publish
+- The library workflow's nuget.org secret is `NUGET_API_KEY` (was `NUGET_ORG_API_KEY`), e.g. `NUGET_API_KEY: ${{ secrets.NUGET_ORG_API_KEY }}`.
+- It publishes only when `src`, `version.json`, `Directory.Build.props` or `nuget.config` change.
+- `dependents` still works; `discover-dependents` scans listed accounts for listeners that call `ccswe-apps/actions/.github/workflows/nanoframework-update-dependencies.yml`.
+- `AUTOMATION_APP_ID` / `AUTOMATION_APP_KEY` are required (they run the shared Dependabot merge jobs).
+- Check names are unchanged: `pipeline / build`, `pipeline / package-lock`, `pipeline / packages-updated`.
 
-on:
-  push:
-    branches: [master]
-  pull_request:
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: false
-
-permissions:
-  contents: read
-  pull-requests: read
-
-jobs:
-  pipeline:
-    uses: ccswe-nanoframework/actions-nanoframework/.github/workflows/nanoframework-build-publish.yml@master
-    with:
-      solution: MySolution.sln
-      publish-nuget: true
-      dependents: |
-        CoryCharlton/Emily.Clock
-    secrets:
-      NUGET_ORG_API_KEY: ${{ secrets.NUGET_ORG_API_KEY }}
-      AUTOMATION_APP_ID: ${{ secrets.AUTOMATION_APP_ID }}
-      AUTOMATION_APP_KEY: ${{ secrets.AUTOMATION_APP_KEY }}
-```
-
-| Job | Runs | Does |
-|-----|------|------|
-| `build` | always | Locked restore (when `packages.lock.json` files are tracked), Release build, unit tests via [vstest-nanoframework](https://github.com/ccswe-nanoframework/vstest-nanoframework), and with `publish-nuget` packs every tracked `*.nuspec` |
-| `package-lock` | PRs | Every `.nfproj` in the solution has a `packages.lock.json` |
-| `packages-updated` | PRs | `nuget update` leaves the tree unchanged |
-| `publish` | push to the default branch with `publish-nuget` | Pushes the packages to nuget.org; with `dependents`, waits (up to 30 min) until nuget.org lists them |
-| `dispatch` | after `publish` | Sends `repository_dispatch: update-dependencies` to each dependent |
-| `dependabot-merge` | Dependabot PRs | Enables auto-merge for non-major updates |
-| `update-behind` | push to the default branch | Updates Dependabot and andy-the-messenger-robot PRs that auto-merge left behind |
-
-| Input | Default | Description |
-|-------|---------|-------------|
-| `solution` | | Path to the `.sln` file |
-| `publish-nuget` | `false` | Pack and publish NuGet packages |
-| `dependents` | | Repos (`owner/name`, one per line) whose dependency update runs after a publish |
-
-Secrets: `NUGET_ORG_API_KEY` (`publish`) and `AUTOMATION_APP_ID`/`AUTOMATION_APP_KEY` (`dispatch`, `dependabot-merge`, `update-behind`; Dependabot-triggered runs read the Dependabot secrets). The caller's `permissions` must include `pull-requests: read`. Versions come from [Nerdbank.GitVersioning](https://github.com/dotnet/Nerdbank.GitVersioning) when the repo has a `version.json`. Publishing requires one.
-
-Checks render as `pipeline / build`, `pipeline / package-lock`, `pipeline / packages-updated` and `pipeline / publish`.
-
-### `nanoframework-update-dependencies.yml`
-
-Updates nanoFramework NuGet packages with [nanodu](https://github.com/nanoframework/nanodu) and opens a PR as the `andy-the-messenger-robot` App, so the PR triggers checks. It then closes older update PRs as superseded and enables auto-merge on the new one, unless it bumps a package's major version. Callers listen for `repository_dispatch: update-dependencies` so a library publish can trigger them.
-
-```yaml
-name: Update dependencies
-
-on:
-  schedule:
-    - cron: '30 20 * * *'
-  repository_dispatch:
-    types: update-dependencies
-  workflow_dispatch:
-
-permissions:
-  contents: read
-
-jobs:
-  update-dependencies:
-    uses: ccswe-nanoframework/actions-nanoframework/.github/workflows/nanoframework-update-dependencies.yml@master
-    with:
-      solution: MySolution.sln
-    secrets:
-      AUTOMATION_APP_ID: ${{ secrets.AUTOMATION_APP_ID }}
-      AUTOMATION_APP_KEY: ${{ secrets.AUTOMATION_APP_KEY }}
-```
-
-Secrets: `AUTOMATION_APP_ID`, `AUTOMATION_APP_KEY`. Pass them explicitly: `secrets: inherit` doesn't cross organizations. These are org secrets in ccswe-nanoframework. Repos outside the org need them as repo secrets, stored in `midworld-internal/secrets` at `github/andy-the-messenger-robot.yaml`.
-
-## Composite actions
-
-Used by the workflows and by `vstest-nanoframework`'s CI. Reference them at `@master`.
-
-### `setup-nanoframework`
-
-Installs the nanoFramework build components, MSBuild (x64) and NuGet CLI 7.x.
-
-```yaml
-- uses: ccswe-nanoframework/actions-nanoframework/.github/actions/setup-nanoframework@master
-```
-
-### `build-nanoframework`
-
-Restores and builds a solution in Release. The restore is locked when `packages.lock.json` files are tracked. When a `version.json` exists, it runs Nerdbank.GitVersioning and stamps the versions; the `NBGV_*` variables stay available to later steps.
-
-```yaml
-- uses: ccswe-nanoframework/actions-nanoframework/.github/actions/build-nanoframework@master
-  with:
-    solution: MySolution.sln
-```
+See the ccswe-apps/actions README for caller shapes.
