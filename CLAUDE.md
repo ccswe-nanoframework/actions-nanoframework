@@ -15,6 +15,7 @@ Reusable GitHub Actions workflows (`workflow_call`) and composite actions for cc
 ```
 .github/workflows/nanoframework-build-publish.yml        build, PR checks (package-lock, packages-updated), publish
 .github/workflows/nanoframework-update-dependencies.yml  nanodu updates as the andy-the-messenger-robot App, closes superseded PRs
+.github/workflows/lint.yml                               actionlint on this repo (required check `actionlint`)
 .github/actions/setup-nanoframework/action.yml           nanobuild, MSBuild (x64), NuGet CLI 7.x
 .github/actions/build-nanoframework/action.yml           NBGV (when version.json exists), restore, MSBuild Release
 ```

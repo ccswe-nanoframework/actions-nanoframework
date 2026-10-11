@@ -118,7 +118,8 @@ jobs:
             exit 1
           fi
           root="$(dirname "$solution")"
-          mapfile -t projects < <(grep -oE '[^"]+\.nfproj' "$solution" | tr '\\' '/')
+          mapfile -t projects < <(grep -oE '[^"]+\.nfproj' "$solution")
+          projects=("${projects[@]//\\//}")
           if [ ${#projects[@]} -eq 0 ]; then
             echo "::error::No .nfproj projects found in $solution"
             exit 1
