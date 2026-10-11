@@ -16,7 +16,7 @@ name: nanoframework-build-publish
 #
 #   jobs:
 #     pipeline:
-#       uses: CCSWE-nanoFramework/actions-nanoframework/.github/workflows/nanoframework-build-publish.yml@master
+#       uses: ccswe-nanoframework/actions-nanoframework/.github/workflows/nanoframework-build-publish.yml@master
 #       with: { solution: <path to .sln> }
 #       secrets:
 #         NUGET_ORG_API_KEY: ${{ secrets.NUGET_ORG_API_KEY }}
@@ -57,14 +57,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: CCSWE-nanoFramework/actions-nanoframework/.github/actions/setup-nanoframework@master
+      - uses: ccswe-nanoframework/actions-nanoframework/.github/actions/setup-nanoframework@master
 
-      - uses: CCSWE-nanoFramework/actions-nanoframework/.github/actions/build-nanoframework@master
+      - uses: ccswe-nanoframework/actions-nanoframework/.github/actions/build-nanoframework@master
         with:
           solution: ${{ inputs.solution }}
 
       - name: Run unit tests
-        uses: CCSWE-nanoFramework/vstest-nanoframework@v2
+        uses: ccswe-nanoframework/vstest-nanoframework@v2
 
       - name: Expose version
         id: version
@@ -142,7 +142,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: CCSWE-nanoFramework/actions-nanoframework/.github/actions/setup-nanoframework@master
+      - uses: ccswe-nanoframework/actions-nanoframework/.github/actions/setup-nanoframework@master
 
       - name: Check NuGet packages are up to date
         shell: bash

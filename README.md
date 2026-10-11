@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   pipeline:
-    uses: CCSWE-nanoFramework/actions-nanoframework/.github/workflows/nanoframework-build-publish.yml@master
+    uses: ccswe-nanoframework/actions-nanoframework/.github/workflows/nanoframework-build-publish.yml@master
     with:
       solution: MySolution.sln
       publish-nuget: true
@@ -38,7 +38,7 @@ jobs:
 
 | Job | Runs | Does |
 |-----|------|------|
-| `build` | always | Locked restore (when `packages.lock.json` files are tracked), Release build, unit tests via [vstest-nanoframework](https://github.com/CCSWE-nanoFramework/vstest-nanoframework), and with `publish-nuget` packs every tracked `*.nuspec` |
+| `build` | always | Locked restore (when `packages.lock.json` files are tracked), Release build, unit tests via [vstest-nanoframework](https://github.com/ccswe-nanoframework/vstest-nanoframework), and with `publish-nuget` packs every tracked `*.nuspec` |
 | `package-lock` | PRs | Every `.nfproj` in the solution has a `packages.lock.json` |
 | `packages-updated` | PRs | `nuget update` leaves the tree unchanged |
 | `publish` | push to the default branch with `publish-nuget` | Pushes the packages to nuget.org; with `dependents`, waits (up to 30 min) until nuget.org lists them |
@@ -75,7 +75,7 @@ permissions:
 
 jobs:
   update-dependencies:
-    uses: CCSWE-nanoFramework/actions-nanoframework/.github/workflows/nanoframework-update-dependencies.yml@master
+    uses: ccswe-nanoframework/actions-nanoframework/.github/workflows/nanoframework-update-dependencies.yml@master
     with:
       solution: MySolution.sln
     secrets:
@@ -83,7 +83,7 @@ jobs:
       AUTOMATION_APP_KEY: ${{ secrets.AUTOMATION_APP_KEY }}
 ```
 
-Secrets: `AUTOMATION_APP_ID`, `AUTOMATION_APP_KEY`. Pass them explicitly: `secrets: inherit` doesn't cross organizations. These are org secrets in CCSWE-nanoFramework. Repos outside the org need them as repo secrets, stored in `midworld-internal/secrets` at `github/andy-the-messenger-robot.yaml`.
+Secrets: `AUTOMATION_APP_ID`, `AUTOMATION_APP_KEY`. Pass them explicitly: `secrets: inherit` doesn't cross organizations. These are org secrets in ccswe-nanoframework. Repos outside the org need them as repo secrets, stored in `midworld-internal/secrets` at `github/andy-the-messenger-robot.yaml`.
 
 ## Composite actions
 
@@ -94,7 +94,7 @@ Used by the workflows and by `vstest-nanoframework`'s CI. Reference them at `@ma
 Installs the nanoFramework build components, MSBuild (x64) and NuGet CLI 7.x.
 
 ```yaml
-- uses: CCSWE-nanoFramework/actions-nanoframework/.github/actions/setup-nanoframework@master
+- uses: ccswe-nanoframework/actions-nanoframework/.github/actions/setup-nanoframework@master
 ```
 
 ### `build-nanoframework`
@@ -102,7 +102,7 @@ Installs the nanoFramework build components, MSBuild (x64) and NuGet CLI 7.x.
 Restores and builds a solution in Release. The restore is locked when `packages.lock.json` files are tracked. When a `version.json` exists, it runs Nerdbank.GitVersioning and stamps the versions; the `NBGV_*` variables stay available to later steps.
 
 ```yaml
-- uses: CCSWE-nanoFramework/actions-nanoframework/.github/actions/build-nanoframework@master
+- uses: ccswe-nanoframework/actions-nanoframework/.github/actions/build-nanoframework@master
   with:
     solution: MySolution.sln
 ```

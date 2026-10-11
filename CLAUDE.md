@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Repository Is
 
-Reusable GitHub Actions workflows (`workflow_call`) and composite actions for CCSWE-nanoFramework repos. No application code. See README for the caller contract.
+Reusable GitHub Actions workflows (`workflow_call`) and composite actions for ccswe-nanoframework repos. No application code. See README for the caller contract.
 
 ```
 .github/workflows/nanoframework-build-publish.yml        build, PR checks (package-lock, packages-updated), publish
